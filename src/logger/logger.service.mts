@@ -17,15 +17,15 @@ export class LoggerService {
         })
     }
 
-    info(...args: unknown[]) {
+    logInfo(...args: unknown[]) {
         this.logger.info(...args)
     }
 
-    error(...args: unknown[]) {
+    logError(...args: unknown[]) {
         this.logger.error(...args)
     }
 
-    warning(...args: unknown[]) {
+    logWarning(...args: unknown[]) {
         this.logger.warn(...args)
     }
 }

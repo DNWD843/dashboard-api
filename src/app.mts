@@ -26,6 +26,6 @@ export class App {
     public async start(): Promise<void> {
         this.useRoutes()
         this.server = this.app.listen(this.port)
-        this.logger.info(`Server is listening on port: ${this.port}`)
+        this.logger.logInfo(`Server is listening on port: ${this.port}`)
     }
 }
