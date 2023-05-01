@@ -1,11 +1,17 @@
-import {LoggerService} from '../logger/logger.service.mjs'
 import {Response, Router} from "express";
-import {IBaseControllerRoute} from "./route.interface";
+import {IBaseControllerRoute} from "./route.interface.mjs";
+import {LoggerService} from "../logger/logger.service.mjs";
 export { Router } from 'express'
 
 export abstract class BaseController {
-    private logger: LoggerService
     private readonly _router: Router
+
+    private logger: LoggerService
+
+    protected constructor(logger: LoggerService) {
+        this.logger = logger
+        this._router = Router()
+    }
 
     get router() {
         return this._router
@@ -28,6 +34,7 @@ export abstract class BaseController {
     protected bindRoutes(routes: IBaseControllerRoute[]) {
         for (const route of routes) {
             const routeHandler = route.func.bind(this)
+            this.logger.logInfo(`[${route.method}] ${route.path}`)
             this.router[route.method](route.path, routeHandler)
         }
     }

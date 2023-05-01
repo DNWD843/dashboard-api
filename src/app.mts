@@ -1,26 +1,29 @@
 import express, { Express } from 'express'
-import {PORT, routes} from "./constants/index.mjs";
+import {routes} from "./constants/index.mjs";
 import { Server } from 'http'
-import {usersRouter} from "./users/index.mjs";
 import dotenv from "dotenv";
 import { Logger, ILogObj } from "tslog";
 import { LoggerService } from './logger/logger.service.mjs'
+import {UsersController} from "./users/index.mjs";
 
 export class App {
-    app: Express
-    port: number
-    server: Server
+    private app: Express
+    private readonly port: number
+    private server: Server
 
-    logger: LoggerService
-    constructor({ port, logger }: { port: number, logger: LoggerService }) {
+    private logger: LoggerService
+
+    private usersController: UsersController
+    constructor({ port, logger, userController }: { port: number, logger: LoggerService, userController: UsersController }) {
         dotenv.config()
         this.app = express()
         this.port = process.env.PORT ? parseInt(process.env.PORT) : port
         this.logger = logger
+        this.usersController = userController
     }
 
     private useRoutes(): void {
-        this.app.use(routes.USERS, usersRouter)
+        this.app.use(routes.USERS, this.usersController.router)
     }
 
     public async start(): Promise<void> {

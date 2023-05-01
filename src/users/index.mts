@@ -1,1 +1,1 @@
-export * from './users.mjs'
+export * from './users.controller.mjs'
