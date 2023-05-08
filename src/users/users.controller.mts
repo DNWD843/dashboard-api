@@ -9,6 +9,7 @@ import 'reflect-metadata'
 import { IUsersController } from './users.controller.interface.mjs'
 import { UserLoginDto } from './dto/user-login.dto.mjs'
 import { UserRegisterDto } from './dto/user-register.dto.mjs'
+import { User } from './user.entity.mjs'
 
 @injectable()
 export class UsersController extends BaseController implements IUsersController {
@@ -26,8 +27,9 @@ export class UsersController extends BaseController implements IUsersController 
 		next(new HttpError(401, 'Unauthorized', 'login'))
 	}
 
-	register(req: Request<{}, {}, UserRegisterDto>, res: Response, next: NextFunction): void {
-		console.log('register dto:', req.body)
-		this.ok(res, 'registered')
+	async register({ body }: Request<{}, {}, UserRegisterDto>, res: Response, next: NextFunction): Promise<void> {
+		const newUser = new User(body.email, body.name)
+		await newUser.setPassword(body.password)
+		this.ok(res, newUser)
 	}
 }
