@@ -1,0 +1,13 @@
+{
+  "watch": [
+    "src"
+  ],
+  "ext": "ts,mts,json",
+  "ignore": [
+    "src/**/*.spec.ts"
+  ],
+  "exec": "ts-node --esm ./src/main.mts",
+  "execMap": {
+    "ts": "ts-node"
+  }
+}
