@@ -10,13 +10,14 @@ import { IUsersController } from './users.controller.interface.mjs'
 import { UserLoginDto } from './dto/user-login.dto.mjs'
 import { UserRegisterDto } from './dto/user-register.dto.mjs'
 import { UserService } from './userService.mjs'
+import { ValidateMiddleware } from '../common/validate.middleware.mjs'
 
 @injectable()
 export class UsersController extends BaseController implements IUsersController {
 	constructor(@inject(DI_KEYS.ILogger) private loggerService: ILogger, @inject(DI_KEYS.UserService) private userService: UserService) {
 		super(loggerService)
 		this.bindRoutes([
-			{ path: routes.REGISTER, method: 'post', func: this.register },
+			{ path: routes.REGISTER, method: 'post', func: this.register, middlewares: [new ValidateMiddleware(UserRegisterDto)] },
 			{ path: routes.LOGIN, method: 'post', func: this.login },
 		])
 	}
