@@ -2,27 +2,27 @@ import express, { Express } from 'express'
 import {routes} from "./constants/index.mjs";
 import { Server } from 'http'
 import dotenv from "dotenv";
-import { Logger, ILogObj } from "tslog";
-import { LoggerService } from './logger/logger.service.mjs'
 import {UsersController} from "./users/index.mjs";
 import {ExceptionFilter} from "./errors/exception.filter.mjs";
+import {ILogger} from "./logger/logger.interface.mjs";
+import {inject, injectable} from "inversify";
+import {DI_KEYS} from "./constants/diKeys.mjs";
+import 'reflect-metadata'
 
+@injectable()
 export class App {
     private app: Express
     private readonly port: number
     private server: Server
 
-    private logger: LoggerService
-
-    private usersController: UsersController
-    private exceptionFilter: ExceptionFilter
-    constructor({ port, logger, userController, exceptionFilter }: { port: number, logger: LoggerService, userController: UsersController, exceptionFilter: ExceptionFilter }) {
+    constructor(
+        @inject(DI_KEYS.ILogger) private logger: ILogger,
+        @inject(DI_KEYS.ExceptionFilter) private exceptionFilter: ExceptionFilter,
+        @inject(DI_KEYS.UsersController) private usersController: UsersController,
+       ) {
         dotenv.config()
         this.app = express()
-        this.port = process.env.PORT ? parseInt(process.env.PORT) : port
-        this.logger = logger
-        this.usersController = userController
-        this.exceptionFilter = exceptionFilter
+        this.port = process.env.PORT ? parseInt(process.env.PORT) : 8080
     }
 
     private useRoutes(): void {

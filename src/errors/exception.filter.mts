@@ -1,13 +1,14 @@
 import {NextFunction, Request, Response} from "express";
-import {LoggerService} from "../logger/logger.service.mjs";
 import {IExceptionFilter} from "./exception.filter.interface.mjs";
 import {HttpError} from "./http-error.class.mjs";
+import {ILogger} from "../logger/logger.interface.mjs";
+import {inject, injectable} from "inversify";
+import {DI_KEYS} from "../constants/diKeys.mjs";
+import 'reflect-metadata'
 
+@injectable()
 export class ExceptionFilter implements IExceptionFilter{
-    private logger: LoggerService
-
-    constructor(logger: LoggerService) {
-        this.logger = logger
+    constructor(@inject(DI_KEYS.ILogger) private logger: ILogger) {
     }
     public catch(err: Error | HttpError, req: Request, res: Response, next: NextFunction) {
         if (err instanceof HttpError) {

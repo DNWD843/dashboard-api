@@ -1,17 +1,20 @@
 import {App} from "./app.mjs";
-import {PORT} from "./constants/index.mjs";
-import {loggerService} from "./logger/logger.service.mjs";
 import {UsersController} from "./users/index.mjs";
 import {ExceptionFilter} from "./errors/exception.filter.mjs";
+import {Container} from "inversify";
+import {ILogger} from "./logger/logger.interface.mjs";
+import {LoggerService} from "./logger/logger.service.mjs";
+import {DI_KEYS} from "./constants/diKeys.mjs";
+import {IExceptionFilter} from "./errors/exception.filter.interface.mjs";
+import 'reflect-metadata'
 
-async function bootstrap() {
-    const app = new App({
-        port: PORT,
-        logger: loggerService,
-        userController: new UsersController(loggerService),
-        exceptionFilter: new ExceptionFilter(loggerService),
-    })
-    await app.start()
-}
+const appContainer = new Container()
+appContainer.bind<ILogger>(DI_KEYS.ILogger).to(LoggerService)
+appContainer.bind<IExceptionFilter>(DI_KEYS.ExceptionFilter).to(ExceptionFilter)
+appContainer.bind<UsersController>(DI_KEYS.UsersController).to(UsersController)
+appContainer.bind<App>(DI_KEYS.Application).to(App)
 
-bootstrap()
+const app = appContainer.get<App>(DI_KEYS.Application)
+app.start()
+
+export { app, appContainer }

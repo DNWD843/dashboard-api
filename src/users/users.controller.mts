@@ -3,10 +3,15 @@ import {NextFunction, Request, Response} from "express";
 import {LoggerService} from "../logger/logger.service.mjs";
 import {routes} from "../constants/index.mjs";
 import {HttpError} from "../errors/http-error.class.mjs";
+import {inject, injectable} from "inversify";
+import {DI_KEYS} from "../constants/diKeys.mjs";
+import {ILogger} from "../logger/logger.interface.mjs";
+import 'reflect-metadata'
 
+@injectable()
 export class UsersController extends BaseController {
-    constructor(logger: LoggerService) {
-        super(logger);
+    constructor(@inject(DI_KEYS.ILogger) private  loggerService: ILogger) {
+        super(loggerService);
         this.bindRoutes([
             { path: routes.REGISTER, method: 'post', func: this.register },
             { path: routes.LOGIN, method: 'post', func: this.login },
