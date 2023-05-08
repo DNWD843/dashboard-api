@@ -9,11 +9,11 @@ import 'reflect-metadata'
 import { IUsersController } from './users.controller.interface.mjs'
 import { UserLoginDto } from './dto/user-login.dto.mjs'
 import { UserRegisterDto } from './dto/user-register.dto.mjs'
-import { User } from './user.entity.mjs'
+import { UserService } from './userService.mjs'
 
 @injectable()
 export class UsersController extends BaseController implements IUsersController {
-	constructor(@inject(DI_KEYS.ILogger) private loggerService: ILogger) {
+	constructor(@inject(DI_KEYS.ILogger) private loggerService: ILogger, @inject(DI_KEYS.UserService) private userService: UserService) {
 		super(loggerService)
 		this.bindRoutes([
 			{ path: routes.REGISTER, method: 'post', func: this.register },
@@ -28,8 +28,11 @@ export class UsersController extends BaseController implements IUsersController 
 	}
 
 	async register({ body }: Request<{}, {}, UserRegisterDto>, res: Response, next: NextFunction): Promise<void> {
-		const newUser = new User(body.email, body.name)
-		await newUser.setPassword(body.password)
-		this.ok(res, newUser)
+		const user = await this.userService.createUser(body)
+
+		if (!user) {
+			return next(new HttpError(422, 'User already exists'))
+		}
+		this.ok(res, { email: user.email })
 	}
 }

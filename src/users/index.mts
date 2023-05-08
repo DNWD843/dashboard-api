@@ -1,3 +1,6 @@
 export * from './users.controller.mjs'
 export * from './dto/user-register.dto.mjs'
 export * from './dto/user-login.dto.mjs'
+export * from './user.entity.mjs'
+export * from './userService.mjs'
+export * from './users.service.interface.mjs'

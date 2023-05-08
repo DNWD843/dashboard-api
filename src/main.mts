@@ -1,5 +1,5 @@
 import { App } from './app.mjs'
-import { UsersController } from './users/index.mjs'
+import { IUserService, UsersController, UserService } from './users/index.mjs'
 import { ExceptionFilter } from './errors/exception.filter.mjs'
 import { Container, ContainerModule, interfaces } from 'inversify'
 import { ILogger } from './logger/logger.interface.mjs'
@@ -13,6 +13,7 @@ export const appBindingsModule = new ContainerModule((bind: interfaces.Bind) => 
 	bind<ILogger>(DI_KEYS.ILogger).to(LoggerService)
 	bind<IExceptionFilter>(DI_KEYS.ExceptionFilter).to(ExceptionFilter)
 	bind<IUsersController>(DI_KEYS.UsersController).to(UsersController)
+	bind<IUserService>(DI_KEYS.UserService).to(UserService)
 	bind<App>(DI_KEYS.Application).to(App)
 })
 
