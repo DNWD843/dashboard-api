@@ -10,6 +10,7 @@
     "lint": "eslint ./src/**",
     "lint:fix": "eslint ./src/** --fix",
     "dev": "nodemon",
+    "dev:inspect": "nodemon -e *ts,json --exec node --inspect=localhost:9222 -r ts-node/register --loader ts-node/esm src/main.mts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
