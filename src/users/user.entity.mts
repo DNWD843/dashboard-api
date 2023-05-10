@@ -16,7 +16,7 @@ export class User {
 		return this._password
 	}
 
-	public async setPassword(password: string): Promise<void> {
-		this._password = await bcrypt.hash(password, 10)
+	public async setPassword(password: string, salt: number): Promise<void> {
+		this._password = await bcrypt.hash(password, salt)
 	}
 }

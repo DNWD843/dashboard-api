@@ -8,12 +8,15 @@ import { DI_KEYS } from './constants/diKeys.mjs'
 import { IExceptionFilter } from './errors/exception.filter.interface.mjs'
 import 'reflect-metadata'
 import { IUsersController } from './users/users.controller.interface.mjs'
+import { ConfigService } from './config/config.service.mjs'
+import { IConfigService } from './config/config.service.interface.mjs'
 
 export const appBindingsModule = new ContainerModule((bind: interfaces.Bind) => {
-	bind<ILogger>(DI_KEYS.ILogger).to(LoggerService)
+	bind<ILogger>(DI_KEYS.ILogger).to(LoggerService).inSingletonScope()
 	bind<IExceptionFilter>(DI_KEYS.ExceptionFilter).to(ExceptionFilter)
 	bind<IUsersController>(DI_KEYS.UsersController).to(UsersController)
 	bind<IUserService>(DI_KEYS.UserService).to(UserService)
+	bind<IConfigService>(DI_KEYS.ConfigService).to(ConfigService).inSingletonScope()
 	bind<App>(DI_KEYS.Application).to(App)
 })
 

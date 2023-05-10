@@ -1,13 +1,13 @@
 import express, { Express } from 'express'
-import { routes } from './constants/index.mjs'
+import { ENV_PORT_KEY, PORT_DEFAULT_VALUE, routes } from './constants/index.mjs'
 import { Server } from 'http'
-import dotenv from 'dotenv'
 import { UsersController } from './users/index.mjs'
-import { ExceptionFilter } from './errors/exception.filter.mjs'
 import { ILogger } from './logger/logger.interface.mjs'
 import { inject, injectable } from 'inversify'
 import { DI_KEYS } from './constants/diKeys.mjs'
 import 'reflect-metadata'
+import { IConfigService } from './config/config.service.interface.mjs'
+import { IExceptionFilter } from './errors/exception.filter.interface.mjs'
 
 @injectable()
 export class App {
@@ -17,12 +17,13 @@ export class App {
 
 	constructor(
 		@inject(DI_KEYS.ILogger) private logger: ILogger,
-		@inject(DI_KEYS.ExceptionFilter) private exceptionFilter: ExceptionFilter,
+		@inject(DI_KEYS.ExceptionFilter) private exceptionFilter: IExceptionFilter,
 		@inject(DI_KEYS.UsersController) private usersController: UsersController,
+		@inject(DI_KEYS.ConfigService) private configService: IConfigService,
 	) {
-		dotenv.config()
 		this.app = express()
-		this.port = process.env.PORT ? parseInt(process.env.PORT) : 8080
+		const port = this.configService.get(ENV_PORT_KEY)
+		this.port = port ? Number(port) : PORT_DEFAULT_VALUE
 	}
 
 	useMiddlewares(): void {

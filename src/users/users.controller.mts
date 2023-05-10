@@ -9,7 +9,7 @@ import 'reflect-metadata'
 import { IUsersController } from './users.controller.interface.mjs'
 import { UserLoginDto } from './dto/user-login.dto.mjs'
 import { UserRegisterDto } from './dto/user-register.dto.mjs'
-import { UserService } from './userService.mjs'
+import { UserService } from './users.service.mjs'
 import { ValidateMiddleware } from '../common/validate.middleware.mjs'
 
 @injectable()

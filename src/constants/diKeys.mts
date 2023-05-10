@@ -4,4 +4,5 @@ export const DI_KEYS = {
 	UsersController: Symbol.for('UsersController'),
 	UserService: Symbol.for('UserService'),
 	ExceptionFilter: Symbol.for('ExceptionFilter'),
+	ConfigService: Symbol.for('ConfigService'),
 }
