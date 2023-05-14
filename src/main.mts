@@ -10,6 +10,7 @@ import 'reflect-metadata'
 import { IUsersController } from './users/users.controller.interface.mjs'
 import { ConfigService } from './config/config.service.mjs'
 import { IConfigService } from './config/config.service.interface.mjs'
+import { PrismaService } from './common/database/prisma.service.mjs'
 
 export const appBindingsModule = new ContainerModule((bind: interfaces.Bind) => {
 	bind<ILogger>(DI_KEYS.ILogger).to(LoggerService).inSingletonScope()
@@ -17,6 +18,7 @@ export const appBindingsModule = new ContainerModule((bind: interfaces.Bind) => 
 	bind<IUsersController>(DI_KEYS.UsersController).to(UsersController)
 	bind<IUserService>(DI_KEYS.UserService).to(UserService)
 	bind<IConfigService>(DI_KEYS.ConfigService).to(ConfigService).inSingletonScope()
+	bind<PrismaService>(DI_KEYS.PrismaService).to(PrismaService).inSingletonScope()
 	bind<App>(DI_KEYS.Application).to(App)
 })
 

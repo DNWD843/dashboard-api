@@ -8,6 +8,7 @@ import { DI_KEYS } from './constants/diKeys.mjs'
 import 'reflect-metadata'
 import { IConfigService } from './config/config.service.interface.mjs'
 import { IExceptionFilter } from './errors/exception.filter.interface.mjs'
+import { PrismaService } from './common/database/prisma.service.mjs'
 
 @injectable()
 export class App {
@@ -20,6 +21,7 @@ export class App {
 		@inject(DI_KEYS.ExceptionFilter) private exceptionFilter: IExceptionFilter,
 		@inject(DI_KEYS.UsersController) private usersController: UsersController,
 		@inject(DI_KEYS.ConfigService) private configService: IConfigService,
+		@inject(DI_KEYS.PrismaService) private prismaService: PrismaService,
 	) {
 		this.app = express()
 		const port = this.configService.get(ENV_PORT_KEY)
@@ -42,6 +44,7 @@ export class App {
 		this.useMiddlewares()
 		this.useRoutes()
 		this.useExceptionFilters()
+		await this.prismaService.connect()
 		this.server = this.app.listen(this.port)
 		this.logger.logInfo(`Server is listening on port: ${this.port}`)
 	}
