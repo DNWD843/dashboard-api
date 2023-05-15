@@ -18,14 +18,16 @@ export class UsersController extends BaseController implements IUsersController 
 		super(loggerService)
 		this.bindRoutes([
 			{ path: routes.REGISTER, method: 'post', func: this.register, middlewares: [new ValidateMiddleware(UserRegisterDto)] },
-			{ path: routes.LOGIN, method: 'post', func: this.login },
+			{ path: routes.LOGIN, method: 'post', func: this.login, middlewares: [new ValidateMiddleware(UserLoginDto)] },
 		])
 	}
 
-	login(req: Request<{}, {}, UserLoginDto>, res: Response, next: NextFunction): void {
-		// this.ok(res, 'logged in')
-		console.log('login dto:', req.body)
-		next(new HttpError(401, 'Unauthorized', 'login'))
+	async login(req: Request<{}, {}, UserLoginDto>, res: Response, next: NextFunction): Promise<void> {
+		const validationResult = await this.userService.validateUser(req.body)
+		if (!validationResult) {
+			return next(new HttpError(401, 'Authorization error', 'login'))
+		}
+		this.ok(res, {})
 	}
 
 	async register({ body }: Request<{}, {}, UserRegisterDto>, res: Response, next: NextFunction): Promise<void> {
@@ -34,6 +36,6 @@ export class UsersController extends BaseController implements IUsersController 
 		if (!user) {
 			return next(new HttpError(422, 'User already exists'))
 		}
-		this.ok(res, { email: user.email })
+		this.ok(res, { email: user.email, id: user.id })
 	}
 }

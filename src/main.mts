@@ -11,6 +11,8 @@ import { IUsersController } from './users/users.controller.interface.mjs'
 import { ConfigService } from './config/config.service.mjs'
 import { IConfigService } from './config/config.service.interface.mjs'
 import { PrismaService } from './common/database/prisma.service.mjs'
+import { IUsersRepository } from './users/users.repository.interface.mjs'
+import { UsersRepository } from './users/users.repository.mjs'
 
 export const appBindingsModule = new ContainerModule((bind: interfaces.Bind) => {
 	bind<ILogger>(DI_KEYS.ILogger).to(LoggerService).inSingletonScope()
@@ -19,6 +21,7 @@ export const appBindingsModule = new ContainerModule((bind: interfaces.Bind) => 
 	bind<IUserService>(DI_KEYS.UserService).to(UserService)
 	bind<IConfigService>(DI_KEYS.ConfigService).to(ConfigService).inSingletonScope()
 	bind<PrismaService>(DI_KEYS.PrismaService).to(PrismaService).inSingletonScope()
+	bind<IUsersRepository>(DI_KEYS.UsersRepository).to(UsersRepository).inSingletonScope()
 	bind<App>(DI_KEYS.Application).to(App)
 })
 
