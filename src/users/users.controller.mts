@@ -11,10 +11,16 @@ import { UserLoginDto } from './dto/user-login.dto.mjs'
 import { UserRegisterDto } from './dto/user-register.dto.mjs'
 import { UserService } from './users.service.mjs'
 import { ValidateMiddleware } from '../common/validate.middleware.mjs'
+import jsonwebtoken from 'jsonwebtoken'
+import { IConfigService } from '../config/config.service.interface.mjs'
 
 @injectable()
 export class UsersController extends BaseController implements IUsersController {
-	constructor(@inject(DI_KEYS.ILogger) private loggerService: ILogger, @inject(DI_KEYS.UserService) private userService: UserService) {
+	constructor(
+		@inject(DI_KEYS.ILogger) private loggerService: ILogger,
+		@inject(DI_KEYS.UserService) private userService: UserService,
+		@inject(DI_KEYS.ConfigService) private configService: IConfigService,
+	) {
 		super(loggerService)
 		this.bindRoutes([
 			{ path: routes.REGISTER, method: 'post', func: this.register, middlewares: [new ValidateMiddleware(UserRegisterDto)] },
@@ -27,7 +33,9 @@ export class UsersController extends BaseController implements IUsersController 
 		if (!validationResult) {
 			return next(new HttpError(401, 'Authorization error', 'login'))
 		}
-		this.ok(res, {})
+
+		const jwt = await this.signJWT(req.body.email, this.configService.get('SECRET') || 'SECRET')
+		this.ok(res, { jwt })
 	}
 
 	async register({ body }: Request<{}, {}, UserRegisterDto>, res: Response, next: NextFunction): Promise<void> {
@@ -37,5 +45,27 @@ export class UsersController extends BaseController implements IUsersController 
 			return next(new HttpError(422, 'User already exists'))
 		}
 		this.ok(res, { email: user.email, id: user.id })
+	}
+
+	private signJWT(email: string, secret: string): Promise<string> {
+		return new Promise<string>((resolve, reject) => {
+			jsonwebtoken.sign(
+				{
+					email,
+					iat: Math.floor(Date.now() / 1000),
+				},
+				secret,
+				{
+					algorithm: 'HS256',
+				},
+				(err, token) => {
+					if (err) {
+						reject(err)
+					}
+
+					resolve(token as string)
+				},
+			)
+		})
 	}
 }
