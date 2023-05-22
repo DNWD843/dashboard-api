@@ -1,6 +1,6 @@
 import { BaseController } from '../common/base.controller.mjs'
 import { NextFunction, Request, Response } from 'express'
-import { routes } from '../constants/index.mjs'
+import { ENV_SECRET_KEY, routes, SECRET_DEFAULT_VALUE } from '../constants/index.mjs'
 import { HttpError } from '../errors/http-error.class.mjs'
 import { inject, injectable } from 'inversify'
 import { DI_KEYS } from '../constants/diKeys.mjs'
@@ -13,6 +13,7 @@ import { UserService } from './users.service.mjs'
 import { ValidateMiddleware } from '../common/validate.middleware.mjs'
 import jsonwebtoken from 'jsonwebtoken'
 import { IConfigService } from '../config/config.service.interface.mjs'
+import { AuthGuard } from '../common/auth.guard.mjs'
 
 @injectable()
 export class UsersController extends BaseController implements IUsersController {
@@ -25,6 +26,7 @@ export class UsersController extends BaseController implements IUsersController 
 		this.bindRoutes([
 			{ path: routes.REGISTER, method: 'post', func: this.register, middlewares: [new ValidateMiddleware(UserRegisterDto)] },
 			{ path: routes.LOGIN, method: 'post', func: this.login, middlewares: [new ValidateMiddleware(UserLoginDto)] },
+			{ path: routes.INFO, method: 'get', func: this.info, middlewares: [new AuthGuard()] },
 		])
 	}
 
@@ -34,7 +36,7 @@ export class UsersController extends BaseController implements IUsersController 
 			return next(new HttpError(401, 'Authorization error', 'login'))
 		}
 
-		const jwt = await this.signJWT(req.body.email, this.configService.get('SECRET') || 'SECRET')
+		const jwt = await this.signJWT(req.body.email, this.configService.get(ENV_SECRET_KEY) || SECRET_DEFAULT_VALUE)
 		this.ok(res, { jwt })
 	}
 
@@ -45,6 +47,11 @@ export class UsersController extends BaseController implements IUsersController 
 			return next(new HttpError(422, 'User already exists'))
 		}
 		this.ok(res, { email: user.email, id: user.id })
+	}
+
+	async info({ user }: Request, res: Response, next: NextFunction): Promise<void> {
+		const userInfo = await this.userService.getUserInfo(user)
+		this.ok(res, { email: userInfo?.email, id: userInfo?.id })
 	}
 
 	private signJWT(email: string, secret: string): Promise<string> {

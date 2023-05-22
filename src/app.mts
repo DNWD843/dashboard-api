@@ -1,5 +1,5 @@
 import express, { Express } from 'express'
-import { ENV_PORT_KEY, PORT_DEFAULT_VALUE, routes } from './constants/index.mjs'
+import { ENV_PORT_KEY, ENV_SECRET_KEY, PORT_DEFAULT_VALUE, routes, SECRET_DEFAULT_VALUE } from './constants/index.mjs'
 import { Server } from 'http'
 import { UsersController } from './users/index.mjs'
 import { ILogger } from './logger/logger.interface.mjs'
@@ -9,6 +9,7 @@ import 'reflect-metadata'
 import { IConfigService } from './config/config.service.interface.mjs'
 import { IExceptionFilter } from './errors/exception.filter.interface.mjs'
 import { PrismaService } from './common/database/prisma.service.mjs'
+import { AuthMiddleware } from './common/auth.middleware.mjs'
 
 @injectable()
 export class App {
@@ -31,6 +32,8 @@ export class App {
 	useMiddlewares(): void {
 		this.app.use(express.json())
 		this.app.use(express.urlencoded({ extended: false }))
+		const authMiddleware = new AuthMiddleware(this.configService.get(ENV_SECRET_KEY) || SECRET_DEFAULT_VALUE)
+		this.app.use(authMiddleware.execute.bind(authMiddleware))
 	}
 
 	private useRoutes(): void {
